@@ -123,7 +123,7 @@ template <class ThreadType> struct test_in_stages
 
             auto last_block_index  = 0;
             auto local_buffer_size = ws / t.p + ((t.id < (ws % t.p)) ? 1 : 0);
-            auto buffer = circular_buffer<size_t>{local_buffer_size + 1};
+            auto buffer = utils_tm::circular_buffer<size_t>{local_buffer_size + 1};
 
             // STAGE0.1 prefill table with one block per thread
             {
