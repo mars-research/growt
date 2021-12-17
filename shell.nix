@@ -10,8 +10,14 @@ let
 in pkgs.mkShell {
   buildInputs = with pkgs; [
     tbb
-    boost
     folly
+
+    # folly's dependencies
+    boost
+    jemalloc
+    glog
+    double-conversion
+    fmt
   ];
   nativeBuildInputs = with pkgs; [
     linuxPackages.perf
