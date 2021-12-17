@@ -210,22 +210,13 @@ if (GROWT_BUILD_JUNCTION)
 endif()
 
 if (GROWT_BUILD_FOLLY)
-  message(STATUS "Looking for folly")
-
-  # NECESSARY FOR SOME REASON
-  include(CheckIncludeFileCXX)
-
-  find_path(FOLLY_DIR folly/CMakeLists.txt
-    PATHS ${CMAKE_CURRENT_SOURCE_DIR}/misc/submodules)
-      #PATHS ENV PATH ENV JUNCTION_ROOT)
-
-  if (FOLLY_DIR)
-    add_subdirectory(${FOLLY_DIR}/folly folly)
-    include_directories(${FOLLY_DIR}/folly)
+  message(STATUS "Looking for Folly")
+  find_package(Folly)
+  if (FOLLY_FOUND)
     message(STATUS "Looking for folly -- found")
   else()
     message(STATUS "Looking for folly -- not found")
-    message("Cannot find folly root directory. "
+    message("Cannot find folly. "
       "Therefore, Folly-Tests cannot be created!")
     set(GROWT_BUILD_FOLLY OFF)
   endif()
