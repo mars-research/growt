@@ -1,3 +1,4 @@
+[[https://github.com/mars-research/growt/actions/workflows/build.yml][https://github.com/mars-research/growt/actions/workflows/build.yml/badge.svg]]
 
 * About
 growt (GrowTable) is a header only library implementing a concurrent
