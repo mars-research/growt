@@ -105,6 +105,11 @@ if (GROWT_ALLOCATOR STREQUAL POOL OR
   set (USE_TBB_MEMPOOL ON)
 endif()
 
+# helper function for adding an executable and install it.
+function( add_executable_and_install target srcs)
+  add_executable(${target} ${srcs})
+  install(TARGETS ${target} RUNTIME)
+endfunction()
 
 
 # find pthread
@@ -112,11 +117,11 @@ find_package(Threads REQUIRED)
 set(TEST_DEP_LIBRARIES ${CMAKE_THREAD_LIBS_INIT} ${TEST_DEP_LIBRARIES})
 
 # COMPILE THE EXAMPLE CODE (example/example.cpp)
-add_executable(example example/example.cpp)
+add_executable_and_install(example example/example.cpp)
 set_target_properties(example PROPERTIES COMPILE_FLAGS "${FLAGS}")
 target_link_libraries(example ${TEST_DEP_LIBRARIES})
 
-add_executable(range_example example/range_example.cpp)
+add_executable_and_install(range_example example/range_example.cpp)
 set_target_properties(range_example PROPERTIES COMPILE_FLAGS "${FLAGS}")
 target_link_libraries(range_example ${TEST_DEP_LIBRARIES})
 
@@ -258,12 +263,12 @@ endif()
 configure_file ("misc/growt_config.h.in" "${PROJECT_BINARY_DIR}/growt_config.h")
 include_directories(${PROJECT_BINARY_DIR})
 
-#add_executable(malloc malloc_count.c)
+#add_executable_and_install(malloc malloc_count.c)
 
 
 function( GrowTExecutable variant cpp directory name )
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${directory})
-  add_executable(${name} tests/${cpp}.cpp)
+  add_executable_and_install(${name} tests/${cpp}.cpp)
   set_target_properties(${name} PROPERTIES COMPILE_FLAGS "${FLAGS}")
   target_compile_definitions(${name} PRIVATE
     -D ${variant}
@@ -271,11 +276,12 @@ function( GrowTExecutable variant cpp directory name )
     -D ${GROWT_ALLOCATOR}
     -D GROWT_USE_CONFIG)
   target_link_libraries(${name} ${TEST_DEP_LIBRARIES} ${ALLOC_LIB})
+  install(TARGETS ${name})
 endfunction( GrowTExecutable )
 
 function( GrowXExecutable variant cpp directory name )
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${directory})
-  add_executable(${name} tests/${cpp}.cpp)
+  add_executable_and_install(${name} tests/${cpp}.cpp)
   set_target_properties(${name} PROPERTIES COMPILE_FLAGS "${FLAGS} -mrtm")
   target_compile_definitions(${name} PRIVATE
     -D ${variant}
@@ -433,7 +439,7 @@ endif()
 if (GROWT_BUILD_TBB)
   function( TBBExecutable variant cpp directory name )
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${directory})
-    add_executable(${name} tests/${cpp}.cpp)
+    add_executable_and_install(${name} tests/${cpp}.cpp)
     set_target_properties(${name} PROPERTIES COMPILE_FLAGS "${FLAGS}")
     target_compile_definitions(${name} PRIVATE
       -D ${variant}
@@ -475,7 +481,7 @@ if (GROWT_BUILD_FOLLY)
   function( FollyExecutable variant cpp directory name )
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${directory})
 
-    add_executable(${name} tests/${cpp}.cpp  )
+    add_executable_and_install(${name} tests/${cpp}.cpp  )
     set_target_properties(${name} PROPERTIES COMPILE_FLAGS "${FLAGS}") #"-O2")
     target_compile_definitions(${name} PRIVATE
       -D ${variant}
@@ -503,7 +509,7 @@ endif()
 if (GROWT_BUILD_CUCKOO)
   function( CuckooExecutable variant cpp directory name )
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${directory})
-    add_executable(${name} tests/${cpp}.cpp)
+    add_executable_and_install(${name} tests/${cpp}.cpp)
     set_target_properties(${name} PROPERTIES COMPILE_FLAGS "${FLAGS}")
     target_compile_definitions(${name} PRIVATE
       -D ${variant}
@@ -536,7 +542,7 @@ endif()
 if (GROWT_BUILD_JUNCTION)
   function( JunctionExecutable variant cpp directory name )
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${directory})
-    add_executable(${name} tests/${cpp}.cpp)
+    add_executable_and_install(${name} tests/${cpp}.cpp)
     set_target_properties(${name} PROPERTIES COMPILE_FLAGS "${FLAGS}")
     target_compile_definitions(${name} PRIVATE
       -D ${variant}
