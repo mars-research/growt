@@ -1,4 +1,5 @@
 build/
-extern/*
-result
+extern/
+result/
+report/
 *.log
