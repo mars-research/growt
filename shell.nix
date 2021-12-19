@@ -23,6 +23,9 @@ in pkgs.mkShell {
     linuxPackages.perf
     cmake
     gcc11
+    python38
+    python38Packages.pandas
+
     pkg-config 
   ];
 }
