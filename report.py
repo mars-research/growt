@@ -26,10 +26,12 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="path to the directories containing all the test binaries.", default="./build")
 parser.add_argument("--output", help="output directory.", default=DEFAULT_OUTPUT_DIR)
 parser.add_argument("-n", "--test-size", help="number of operations(insert/delete) per test.", default=DEFAULT_TEST_SIZE, type=int)
-parser.add_argument("-l", "--load-factor", help="hashtable capacity", default=0.75, type=int)
+parser.add_argument("-l", "--load-factor", help="hashtable capacity", default=0.75, type=float)
 parser.add_argument("--log", help="log level", default="INFO")
 args = parser.parse_args()
 logging.debug(f"Program arguments: {args}")
+capacity = args.test_size // args.load_factor
+logging.info(f"Running tests with size {args.test_size} and capacity {capacity}")
 
 # Setup console logging handler
 stream_handler = logging.StreamHandler()
@@ -67,12 +69,13 @@ for category in test_categories:
     logging.info(f"Running test <{test}>.")
     outfile_path = path.join(output_dir, f"{test}.log")
     with open(outfile_path, 'w') as outfile:
-      subprocess.run(path.join(test_dir, test), stdout=outfile).check_returncode()
+      subprocess.run([path.join(test_dir, test), '-c', str(capacity), '-n', str(args.test_size)], stdout=outfile).check_returncode()
 
     logging.debug(f"Parsing test <{test}> output.")
     with open(outfile_path, 'r', newline='') as outfile:
       output_csv = pd.read_csv(outfile, sep='\s+')
       columns = filter(lambda s: s.startswith('t_'), output_csv.columns)
+      
 
     logging.info(f"Finished running test <{test}>.")
 
