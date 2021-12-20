@@ -65,6 +65,8 @@ for category in test_categories:
 
   output_dir = path.join(args.output, category) 
   pathlib.Path(output_dir).mkdir()
+  results = [] # Lists of KV pairs results which will be written the a CSV.
+  column_names = {'name'}
   for test in test_files:
     logging.info(f"Running test <{test}>.")
     outfile_path = path.join(output_dir, f"{test}.log")
@@ -74,11 +76,19 @@ for category in test_categories:
     logging.debug(f"Parsing test <{test}> output.")
     with open(outfile_path, 'r', newline='') as outfile:
       output_csv = pd.read_csv(outfile, sep='\s+')
-      columns = filter(lambda s: s.startswith('t_'), output_csv.columns)
-      
-
+      columns = list(filter(lambda s: s.startswith('t_'), output_csv.columns))
+      logging.debug(f"Found columns {columns} for <{test}")
+      column_names.update(columns)
+      result = {column: output_csv[column].mean() for column in columns}
+      result['name'] = category
+      results.append(result)
     logging.info(f"Finished running test <{test}>.")
 
-
-
+  # Write results to CSV
+  output_report_path = path.join(output_dir, f'{category}.csv')
+  logging.info(f"Writting the report of category <{category}> to {output_report_path}")
+  with open(output_report_path, 'w', newline='') as csvfile:
+    writer = csv.DictWriter(csvfile, fieldnames=column_names)
+    writer.writeheader()
+    writer.writerows(results)
 
