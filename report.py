@@ -81,7 +81,7 @@ for category in test_categories:
     with open(outfile_path, 'r', newline='') as outfile:
       output_csv = pd.read_csv(outfile, sep='\s+')
       columns = list(filter(lambda s: s.startswith('t_'), output_csv.columns))
-      logging.debug(f"Found columns {columns} for <{test}")
+      logging.debug(f"Found columns {columns} for <{test}>")
       column_names.update(columns)
       result = {column: output_csv[column].mean() for column in columns}
       result['name'] = test
