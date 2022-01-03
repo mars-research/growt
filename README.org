@@ -1,6 +1,8 @@
 [[https://github.com/mars-research/growt/actions/workflows/build.yml][https://github.com/mars-research/growt/actions/workflows/build.yml/badge.svg]]
 
 * About
+`export TBB_MALLOC_USE_HUGE_PAGES=1` to ask TBB to use huge pages.
+
 growt (GrowTable) is a header only library implementing a concurrent
 growing hash table.  There are different variants depending on the use
 case. See explanation below.
