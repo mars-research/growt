@@ -92,7 +92,7 @@ for category in args.test_categories:
         result['name'] = test
         result['threads'] = n_threads
         results.append(result)
-      logging.info(f"Finished running test <{test}>.")
+      logging.info(f"Finished running test <{test}> with {n_threads} threads.")
 
   # Write results to CSV
   output_report_path = path.join(output_dir, f'{category}.csv')
