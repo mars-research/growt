@@ -89,6 +89,7 @@ for category in args.test_categories:
         column_names.update(columns)
         result = {column: output_csv[column].mean() for column in columns}
         result['name'] = test
+        result['threads'] = n_threads
         results.append(result)
       logging.info(f"Finished running test <{test}>.")
 
