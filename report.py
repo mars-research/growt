@@ -11,6 +11,7 @@ import csv
 import pandas as pd
 import multiprocessing
 import math
+from collections import OrderedDict
 
 # Initialize logging
 logger = logging.getLogger()
@@ -71,7 +72,7 @@ for category in args.test_categories:
   output_dir = path.join(args.output, category) 
   pathlib.Path(output_dir).mkdir()
   results = [] # Lists of KV pairs results which will be written the a CSV.
-  column_names = {'name'}
+  column_names = OrderedDict.fromkeys(['name', 'threads'])
   for test in test_files:
     for n_threads in args.num_threads:
       # Run test.
@@ -86,7 +87,7 @@ for category in args.test_categories:
         output_csv = pd.read_csv(outfile, sep='\s+')
         columns = list(filter(lambda s: s.startswith('t_'), output_csv.columns))
         logging.debug(f"Found columns {columns} for <{test}>")
-        column_names.update(columns)
+        column_names.update(OrderedDict.fromkeys(columns))
         result = {column: output_csv[column].mean() for column in columns}
         result['name'] = test
         result['threads'] = n_threads
