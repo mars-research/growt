@@ -65,7 +65,7 @@ if not os.path.isdir(args.output):
   pathlib.Path(args.output).mkdir(parents=True, exist_ok=True)
 
 # Run all tests and generate reports.
-logging.info(f"Running tests with categories {args.test_categories}, size {args.test_size}, capacity {capacity}, and {args.num_threads} threads.")
+logging.info(f"Running tests with categories {args.test_categories}, hashtables {args.hashtables}, size {args.test_size}, capacity {capacity}, and {args.num_threads} threads.")
 for category in args.test_categories:
   test_dir = path.join(args.input, category)
   if path.isdir(test_dir):
