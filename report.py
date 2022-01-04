@@ -33,6 +33,12 @@ DEFAULT_CATEGORIES = [
   'con',
   'del',
 ]
+DEFAULT_HASHTABLES = [
+  'folly',
+  'folklore',
+  'TBBum',
+  'cuckoo',
+]
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", help="path to the directories containing all the test binaries.", default="./build")
 parser.add_argument("--output", help="output directory.", default=DEFAULT_OUTPUT_DIR)
@@ -40,6 +46,7 @@ parser.add_argument("-n", "--test-size", help="number of operations(insert/delet
 parser.add_argument("-l", "--load-factor", help="hashtable load factor", default=0.75, type=float)
 parser.add_argument("-t", "--num_threads", help="number of threads", default=DEFAULT_THREADS, type=int, nargs='+')
 parser.add_argument("-c", "--test_categories", help="test categories to run", default=DEFAULT_THREADS, type=str, nargs='+')
+parser.add_argument("--hashtables", help="hashtables to run", default=DEFAULT_HASHTABLES, type=str, nargs='+')
 parser.add_argument("--log", help="log level", default="INFO")
 args = parser.parse_args()
 logging.debug(f"Program arguments: {args}")
@@ -74,6 +81,8 @@ for category in args.test_categories:
   results = {} # A map of CSV files.
   column_names = OrderedDict.fromkeys(['name', 'threads'])
   for test in test_files:
+    if all(map(lambda ht: test.find(ht) == -1, args.hashtables)):
+      continue
     for n_threads in args.num_threads:
       # Run test.
       logging.info(f"Running test <{test}> with {n_threads} threads.")
