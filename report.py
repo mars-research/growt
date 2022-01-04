@@ -90,7 +90,7 @@ for category in args.test_categories:
         for metric in metrics:
           rows = results.setdefault(metric, OrderedDict())
           row = rows.setdefault(n_threads, OrderedDict({'num_threads': n_threads}))
-          row[test] = output_csv[metric].mean()
+          row[test] = "{:.2f}".format(args.test_size / output_csv[metric].mean() / 1000)
       logging.info(f"Finished running test <{test}> with {n_threads} threads.")
 
   # Write results to CSVs
@@ -99,7 +99,7 @@ for category in args.test_categories:
     logging.info(f"Writting the report of category <{category}> to {output_report_path}")
     with open(output_report_path, 'w', newline='') as csvfile:
       rows = results[metric]
-      writer = csv.DictWriter(csvfile, fieldnames=next(iter(rows.values())).keys())
+      writer = csv.DictWriter(csvfile, fieldnames=next(iter(rows.values())).keys(), quoting=csv.QUOTE_NONE)
       writer.writeheader()
       writer.writerows(rows.values())
 
