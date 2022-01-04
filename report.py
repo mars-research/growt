@@ -71,7 +71,7 @@ for category in args.test_categories:
 
   output_dir = path.join(args.output, category) 
   pathlib.Path(output_dir).mkdir()
-  results = [] # Lists of KV pairs results which will be written the a CSV.
+  results = {} # A map of CSV files.
   column_names = OrderedDict.fromkeys(['name', 'threads'])
   for test in test_files:
     for n_threads in args.num_threads:
@@ -85,20 +85,21 @@ for category in args.test_categories:
       logging.debug(f"Parsing test <{test}> output.")
       with open(outfile_path, 'r', newline='') as outfile:
         output_csv = pd.read_csv(outfile, sep='\s+')
-        columns = list(filter(lambda s: s.startswith('t_'), output_csv.columns))
-        logging.debug(f"Found columns {columns} for <{test}>")
-        column_names.update(OrderedDict.fromkeys(columns))
-        result = {column: output_csv[column].mean() for column in columns}
-        result['name'] = test
-        result['threads'] = n_threads
-        results.append(result)
+        metrics = list(filter(lambda s: s.startswith('t_'), output_csv.columns))
+        logging.debug(f"Found metrics {metrics} for <{test}>")
+        for metric in metrics:
+          rows = results.setdefault(metric, OrderedDict())
+          row = rows.setdefault(n_threads, OrderedDict({'num_threads': n_threads}))
+          row[test] = output_csv[metric].mean()
       logging.info(f"Finished running test <{test}> with {n_threads} threads.")
 
-  # Write results to CSV
-  output_report_path = path.join(output_dir, f'{category}.csv')
-  logging.info(f"Writting the report of category <{category}> to {output_report_path}")
-  with open(output_report_path, 'w', newline='') as csvfile:
-    writer = csv.DictWriter(csvfile, fieldnames=column_names)
-    writer.writeheader()
-    writer.writerows(results)
+  # Write results to CSVs
+  for metric in results:
+    output_report_path = path.join(output_dir, f'{category}_{metric}.csv')
+    logging.info(f"Writting the report of category <{category}> to {output_report_path}")
+    with open(output_report_path, 'w', newline='') as csvfile:
+      rows = results[metric]
+      writer = csv.DictWriter(csvfile, fieldnames=next(iter(rows.values())).keys())
+      writer.writeheader()
+      writer.writerows(rows.values())
 
