@@ -19,3 +19,6 @@
 [submodule "misc/submodules/smhasher"]
 	path = misc/submodules/smhasher
 	url = https://github.com/rurban/smhasher.git
+[submodule "kmer-counting-hash-table"]
+	path = kmer-counting-hash-table
+	url = git@github.com:mars-research/kmer-counting-hash-table.git
