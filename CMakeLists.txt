@@ -111,6 +111,9 @@ function( add_executable_and_install target srcs)
   install(TARGETS ${target} RUNTIME)
 endfunction()
 
+# depends on kmer-ht
+subdirs(kmer-counting-hash-table)
+set(TEST_DEP_LIBRARIES ht_lib ${TEST_DEP_LIBRARIES})
 
 # find pthread
 find_package(Threads REQUIRED)

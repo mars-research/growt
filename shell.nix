@@ -9,6 +9,8 @@ let
   };
 in pkgs.mkShell {
   buildInputs = with pkgs; [
+    ninja
+    cmake
     tbb
     folly
 
@@ -18,6 +20,11 @@ in pkgs.mkShell {
     glog
     double-conversion
     fmt
+
+    # kmer-ht dependencies
+    boost
+    numactl
+    zlib
   ];
   nativeBuildInputs = with pkgs; [
     linuxPackages.perf
@@ -28,4 +35,5 @@ in pkgs.mkShell {
 
     pkg-config 
   ];
+  NIX_CFLAGS_COMPILE = "-march=native";
 }
