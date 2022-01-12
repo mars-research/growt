@@ -13,6 +13,29 @@ import multiprocessing
 import math
 from collections import OrderedDict
 
+
+def run_multithreaded_benchmark(test_name, num_threads, test_size, test_dir, output_dir):
+  for n_threads in num_threads:
+    # Run test.
+    logging.info(f"Running test <{test_name}> with {n_threads} threads.")
+    outfile_path = path.join(output_dir, f"{test}_{n_threads}.log")
+    with open(outfile_path, 'w') as outfile:
+      subprocess.run([path.join(test_dir, test_name), '-c', str(capacity), '-n', str(test_size), '-p', str(n_threads)], stdout=outfile).check_returncode()
+
+    # Parse output.
+    logging.debug(f"Parsing test <{test_name}> output.")
+    with open(outfile_path, 'r', newline='') as outfile:
+      output_csv = pd.read_csv(outfile, sep='\s+')
+      metrics = list(filter(lambda s: s.startswith('t_'), output_csv.columns))
+      logging.debug(f"Found metrics {metrics} for <{test_name}>")
+      for metric in metrics:
+        rows = results.setdefault(metric, OrderedDict())
+        row = rows.setdefault(n_threads, OrderedDict({'num_threads': n_threads}))
+        row[test] = "{:.2f}".format(args.test_size / output_csv[metric].mean() / 1000)
+  
+  logging.info(f"Finished running test <{test_name}> with {n_threads} threads.")
+
+
 # Initialize logging
 logger = logging.getLogger()
 logger.setLevel(logging.NOTSET)
@@ -81,26 +104,10 @@ for category in args.test_categories:
   results = {} # A map of CSV files.
   column_names = OrderedDict.fromkeys(['name', 'threads'])
   for test in test_files:
+    # Only run the tests that's specified in the cmd args.
     if all(map(lambda ht: test.find(ht) == -1, args.hashtables)):
       continue
-    for n_threads in args.num_threads:
-      # Run test.
-      logging.info(f"Running test <{test}> with {n_threads} threads.")
-      outfile_path = path.join(output_dir, f"{test}_{n_threads}.log")
-      with open(outfile_path, 'w') as outfile:
-        subprocess.run([path.join(test_dir, test), '-c', str(capacity), '-n', str(args.test_size), '-p', str(n_threads)], stdout=outfile).check_returncode()
-
-      # Parse output.
-      logging.debug(f"Parsing test <{test}> output.")
-      with open(outfile_path, 'r', newline='') as outfile:
-        output_csv = pd.read_csv(outfile, sep='\s+')
-        metrics = list(filter(lambda s: s.startswith('t_'), output_csv.columns))
-        logging.debug(f"Found metrics {metrics} for <{test}>")
-        for metric in metrics:
-          rows = results.setdefault(metric, OrderedDict())
-          row = rows.setdefault(n_threads, OrderedDict({'num_threads': n_threads}))
-          row[test] = "{:.2f}".format(args.test_size / output_csv[metric].mean() / 1000)
-      logging.info(f"Finished running test <{test}> with {n_threads} threads.")
+    run_multithreaded_benchmark(test, args.num_threads, args.test_size, test_dir, output_dir)
 
   # Write results to CSVs
   for metric in results:
