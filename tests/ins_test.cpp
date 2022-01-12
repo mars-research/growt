@@ -73,6 +73,8 @@ alignas(64) static uint64_t* keys;
 alignas(64) static std::atomic_size_t current_block;
 alignas(64) static std::atomic_size_t errors;
 
+double skew;
+
 
 int generate_random(size_t n)
 {
@@ -80,9 +82,9 @@ int generate_random(size_t n)
 
     ttm::execute_blockwise_parallel(
         current_block, n, [&dis](size_t s, size_t e) {
-            std::mt19937_64 re(s * 10293903128401092ull);
+            kmercounter::zipf_distribution dist{skew, 192ull * (1ull << 20), s + 1};
 
-            for (size_t i = s; i < e; i++) { keys[i] = dis(re); }
+            for (size_t i = s; i < e; i++) { keys[i] = dist(); }
         });
 
     return 0;
@@ -99,7 +101,7 @@ template <class Hash> int fill(Hash& hash, size_t end)
         if (!output.second)
         {
             // Insertion failed? Possibly already inserted.
-            dtm::if_debug("Warning: failed insertion");
+            // dtm::if_debug(std::string("Warning: failed insertion: ") + std::to_string(key));
             ++err;
         }
 
@@ -127,7 +129,7 @@ template <class Hash> int find_unsucc(Hash& hash, size_t end)
         if (data != hash.end())
         {
             // Random key found (unexpected)
-            dtm::if_debug("Warning: found one of the random keys");
+            // dtm::if_debug("Warning: found one of the random keys");
             ++err;
         }
     });
@@ -262,6 +264,7 @@ int main(int argn, char** argc)
     size_t                        p   = c.int_arg("-p", 4);
     size_t                        cap = c.int_arg("-c", n);
     size_t                        it  = c.int_arg("-it", 5);
+                                  skew= c.double_arg("-skew", 0.9);
     if (!c.report()) return 1;
 
     otm::out() << otm::width(5) << "#i" << otm::width(5) << "p"
