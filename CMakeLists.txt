@@ -106,8 +106,8 @@ function( add_executable_and_install target srcs)
 endfunction()
 
 # depends on kmer-ht
-subdirs(kmer-counting-hash-table)
-set(TEST_DEP_LIBRARIES ht_lib ${TEST_DEP_LIBRARIES})
+# subdirs(kmer-counting-hash-table)
+# set(TEST_DEP_LIBRARIES ht_lib ${TEST_DEP_LIBRARIES})
 
 # find pthread
 find_package(Threads REQUIRED)
@@ -143,7 +143,6 @@ elseif(TBB_INTERFACE_VERSION LESS 8000)
   if (USE_TBB_MEMPOOL)
     message(STATUS "Switch to aligned alloc!")
     set(GROWT_ALLOCATOR ALIGNED)
-  endif()
   endif()
   if (GROWT_USE_SCALABLE_ALLOCATORS_WHERE_APPROPRIATE)
     message(STATUS "Switch string and complex_slot allocators to default!")
@@ -428,7 +427,6 @@ if (TBB_FOUND)
   # target_link_libraries(functionality_paGrowT ${TBB_LIBRARIES})
   # target_link_libraries(functionality_psGrowT ${TBB_LIBRARIES})
 
-  endif()
   if (GROWT_USE_SCALABLE_ALLOCATORS_WHERE_APPROPRIATE)
     target_compile_definitions(text_none_folklore    PRIVATE -D TBB_AS_DEFAULT)
     target_compile_definitions(text_full_sequential  PRIVATE -D TBB_AS_DEFAULT)
