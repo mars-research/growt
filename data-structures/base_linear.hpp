@@ -57,9 +57,10 @@ class base_linear_config
         // capacity is at least twice as large, as the inserted capacity
         static size_t compute_capacity(size_t desired_capacity)
         {
-            auto temp = 256u;
-            while (temp < desired_capacity) temp <<= 1;
-            return temp << 1;
+            // auto temp = 256u;
+            // while (temp < desired_capacity) temp <<= 1;
+            // return temp << 1;
+            return desired_capacity;
         }
 
         static size_t compute_right_shift(size_t capacity)
