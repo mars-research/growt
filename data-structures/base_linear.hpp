@@ -60,7 +60,7 @@ class base_linear_config
             // auto temp = 256u;
             // while (temp < desired_capacity) temp <<= 1;
             // return temp << 1;
-            return desired_capacity;
+            return desired_capacity << 1;
         }
 
         static size_t compute_right_shift(size_t capacity)
